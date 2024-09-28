@@ -4,6 +4,7 @@ import Title from "antd/es/typography/Title";
 import TagList from "@/components/TagList";
 import MdViewer from "@/components/MdViewer";
 import "./index.css";
+import useAddUserSignInRecord from "@/hooks/useAddUserSignInRecord";
 
 interface Props {
   question: API.QuestionVO;
@@ -16,6 +17,9 @@ interface Props {
  */
 const QuestionCard = (props: Props) => {
   const { question } = props;
+
+  // 签到
+  useAddUserSignInRecord();
 
   // SEO搜索引擎优化，百度爬虫特别喜欢一级标题，一级标题代表整个页面的唯一标识、唯一的核心内容，所以题目、题库详情页都可以用一级标题，这样就可能会增加搜索的次数
   return (

@@ -22,6 +22,12 @@ export const menus = [
     target: "_blank",
   },
   {
+    path: "/user/center",
+    name: "用户中心",
+    hideInMenu:true,
+    access: ACCESS_ENUM.USER,
+  },
+  {
     path: "/admin",
     name: "管理",
     icon: <CrownOutlined />,
