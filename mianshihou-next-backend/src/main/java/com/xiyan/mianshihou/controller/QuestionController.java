@@ -2,20 +2,20 @@ package com.xiyan.mianshihou.controller;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jd.platform.hotkey.client.callback.JdHotKeyStore;
 import com.xiyan.mianshihou.annotation.AuthCheck;
 import com.xiyan.mianshihou.common.BaseResponse;
 import com.xiyan.mianshihou.common.DeleteRequest;
 import com.xiyan.mianshihou.common.ErrorCode;
 import com.xiyan.mianshihou.common.ResultUtils;
+import com.xiyan.mianshihou.constant.HotKeyConstant;
 import com.xiyan.mianshihou.constant.UserConstant;
 import com.xiyan.mianshihou.exception.BusinessException;
 import com.xiyan.mianshihou.exception.ThrowUtils;
-import com.xiyan.mianshihou.model.dto.question.QuestionAddRequest;
-import com.xiyan.mianshihou.model.dto.question.QuestionEditRequest;
-import com.xiyan.mianshihou.model.dto.question.QuestionQueryRequest;
-import com.xiyan.mianshihou.model.dto.question.QuestionUpdateRequest;
+import com.xiyan.mianshihou.model.dto.question.*;
 import com.xiyan.mianshihou.model.entity.Question;
 import com.xiyan.mianshihou.model.entity.User;
+import com.xiyan.mianshihou.model.vo.QuestionBankVO;
 import com.xiyan.mianshihou.model.vo.QuestionVO;
 import com.xiyan.mianshihou.service.QuestionService;
 import com.xiyan.mianshihou.service.UserService;
@@ -145,11 +145,30 @@ public class QuestionController {
     @GetMapping("/get/vo")
     public BaseResponse<QuestionVO> getQuestionVOById(long id, HttpServletRequest request) {
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
+
+        // 生成 key
+        String key = HotKeyConstant.HOT_QUESTION_KEY + id;
+        // 如果是热 key
+        if (JdHotKeyStore.isHotKey(key)) {
+            // 从本地缓存中获取缓存值
+            Object cachedQuestionVO = JdHotKeyStore.get(key);
+            if (cachedQuestionVO != null) {
+                // 如果缓存中有值，直接返回缓存的值
+                return ResultUtils.success((QuestionVO) cachedQuestionVO);
+            }
+        }
+
         // 查询数据库
         Question question = questionService.getById(id);
         ThrowUtils.throwIf(question == null, ErrorCode.NOT_FOUND_ERROR);
+        // 查询题库封装类
+        QuestionVO questionVO = questionService.getQuestionVO(question, request);
+
+        // 设置本地缓存（如果不是热 key，这个方法不会设置缓存）
+        JdHotKeyStore.smartSet(key, questionVO);
+
         // 获取封装类
-        return ResultUtils.success(questionService.getQuestionVO(question, request));
+        return ResultUtils.success(questionVO);
     }
 
     /**
@@ -265,5 +284,18 @@ public class QuestionController {
         ThrowUtils.throwIf(size > 200, ErrorCode.PARAMS_ERROR);
         Page<Question> questionPage = questionService.searchFromEs(questionQueryRequest);
         return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
+    }
+
+    /**
+     * 批量删除题目（仅管理员可用）
+     * @param questionBatchDeleteRequest
+     * @return
+     */
+    @PostMapping("/delete/batch")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> batchDeleteQuestions(@RequestBody QuestionBatchDeleteRequest questionBatchDeleteRequest) {
+        ThrowUtils.throwIf(questionBatchDeleteRequest == null, ErrorCode.PARAMS_ERROR);
+        questionService.batchDeleteQuestions(questionBatchDeleteRequest.getQuestionIdList());
+        return ResultUtils.success(true);
     }
 }

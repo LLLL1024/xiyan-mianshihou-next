@@ -1,11 +1,13 @@
 package com.xiyan.mianshihou.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jd.platform.hotkey.client.callback.JdHotKeyStore;
 import com.xiyan.mianshihou.annotation.AuthCheck;
 import com.xiyan.mianshihou.common.BaseResponse;
 import com.xiyan.mianshihou.common.DeleteRequest;
 import com.xiyan.mianshihou.common.ErrorCode;
 import com.xiyan.mianshihou.common.ResultUtils;
+import com.xiyan.mianshihou.constant.HotKeyConstant;
 import com.xiyan.mianshihou.constant.UserConstant;
 import com.xiyan.mianshihou.exception.BusinessException;
 import com.xiyan.mianshihou.exception.ThrowUtils;
@@ -144,6 +146,20 @@ public class QuestionBankController {
         ThrowUtils.throwIf(questionBankQueryRequest == null, ErrorCode.PARAMS_ERROR);
         Long id = questionBankQueryRequest.getId();
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
+
+        // 生成 key
+//        String key = "bank_detail_" + id;
+        String key = HotKeyConstant.HOT_BANK_KEY + id;
+        // 如果是热 key
+        if (JdHotKeyStore.isHotKey(key)) {
+            // 从本地缓存中获取缓存值
+            Object cachedQuestionBankVO = JdHotKeyStore.get(key);
+            if (cachedQuestionBankVO != null) {
+                // 如果缓存中有值，直接返回缓存的值
+                return ResultUtils.success((QuestionBankVO) cachedQuestionBankVO);
+            }
+        }
+
         // 查询数据库
         QuestionBank questionBank = questionBankService.getById(id);
         ThrowUtils.throwIf(questionBank == null, ErrorCode.NOT_FOUND_ERROR);
@@ -161,6 +177,10 @@ public class QuestionBankController {
             Page<QuestionVO> questionVOPage = questionService.getQuestionVOPage(questionPage, request);
             questionBankVO.setQuestionPage(questionVOPage);
         }
+
+        // 设置本地缓存（如果不是热 key，这个方法不会设置缓存）
+        JdHotKeyStore.smartSet(key, questionBankVO);
+
         // 获取封装类
         return ResultUtils.success(questionBankVO);
     }
