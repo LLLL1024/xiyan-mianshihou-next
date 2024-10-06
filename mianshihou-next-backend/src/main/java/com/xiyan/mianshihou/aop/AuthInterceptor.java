@@ -23,8 +23,8 @@ import javax.servlet.http.HttpServletRequest;
  * @author <a href="https://github.com/LLLL1024">程序员兮颜</a>
  
  */
-@Aspect
-@Component
+//@Aspect
+//@Component
 public class AuthInterceptor {
 
     @Resource
