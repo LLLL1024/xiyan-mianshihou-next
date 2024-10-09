@@ -157,22 +157,28 @@ public class QuestionController {
     @GetMapping("/get/vo")
     public BaseResponse<QuestionVO> getQuestionVOById(long id, HttpServletRequest request) {
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
-        // 检测和处置爬虫
-        User loginUser = userService.getLoginUser(request);
-        crawlerDetect(loginUser.getId());
+//        // 检测和处置爬虫
+//        User loginUser = userService.getLoginUser(request);
+//        crawlerDetect(loginUser.getId());
+        // 检测和处置爬虫（可以自行扩展为 - 登录后才能获取到答案）
+        User loginUser = userService.getLoginUserPermitNull(request);
+        if (loginUser != null) {
+            crawlerDetect(loginUser.getId());
+        }
         // 友情提示，对于敏感的内容，可以再打印一些日志，记录用户访问的内容
 
-        // 生成 key
-        String key = HotKeyConstant.HOT_QUESTION_KEY + id;
-        // 如果是热 key
-        if (JdHotKeyStore.isHotKey(key)) {
-            // 从本地缓存中获取缓存值
-            Object cachedQuestionVO = JdHotKeyStore.get(key);
-            if (cachedQuestionVO != null) {
-                // 如果缓存中有值，直接返回缓存的值
-                return ResultUtils.success((QuestionVO) cachedQuestionVO);
-            }
-        }
+        // todo 取消注释开启 HotKey（须确保 HotKey 依赖被打进 jar 包）
+//        // 生成 key
+//        String key = HotKeyConstant.HOT_QUESTION_KEY + id;
+//        // 如果是热 key
+//        if (JdHotKeyStore.isHotKey(key)) {
+//            // 从本地缓存中获取缓存值
+//            Object cachedQuestionVO = JdHotKeyStore.get(key);
+//            if (cachedQuestionVO != null) {
+//                // 如果缓存中有值，直接返回缓存的值
+//                return ResultUtils.success((QuestionVO) cachedQuestionVO);
+//            }
+//        }
 
         // 查询数据库
         Question question = questionService.getById(id);
@@ -180,8 +186,9 @@ public class QuestionController {
         // 查询题库封装类
         QuestionVO questionVO = questionService.getQuestionVO(question, request);
 
-        // 设置本地缓存（如果不是热 key，这个方法不会设置缓存）
-        JdHotKeyStore.smartSet(key, questionVO);
+        // todo 取消注释开启 HotKey（须确保 HotKey 依赖被打进 jar 包）
+//        // 设置本地缓存（如果不是热 key，这个方法不会设置缓存）
+//        JdHotKeyStore.smartSet(key, questionVO);
 
         // 获取封装类
         return ResultUtils.success(questionVO);
@@ -386,7 +393,11 @@ public class QuestionController {
         long size = questionQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 200, ErrorCode.PARAMS_ERROR);
-        Page<Question> questionPage = questionService.searchFromEs(questionQueryRequest);
+        // todo 取消注释开启 ES（须先配置 ES）
+        // 查询 ES
+        // Page<Question> questionPage = questionService.searchFromEs(questionQueryRequest);
+        // 查询数据库（作为没有 ES 的降级方案）
+        Page<Question> questionPage = questionService.listQuestionByPage(questionQueryRequest);
         return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
     }
 

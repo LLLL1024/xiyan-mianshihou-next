@@ -9,8 +9,9 @@ import org.springframework.context.annotation.Configuration;
 /**
  * hotkey 热 key 发现配置
  */
-@Configuration
-@ConfigurationProperties(prefix = "hotkey")
+// todo 取消注释开启 HotKey（须先配置 HotKey）
+//@Configuration
+//@ConfigurationProperties(prefix = "hotkey")
 @Data
 public class HotKeyConfig {
 

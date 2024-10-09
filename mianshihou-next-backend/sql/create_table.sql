@@ -5,7 +5,7 @@
 create database if not exists mianshihou;
 
 -- 切换库
-use mianshiya;
+use mianshihou;
 
 -- 用户表
 create table if not exists user
