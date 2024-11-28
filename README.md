@@ -12,6 +12,8 @@
 
 上线地址：http://mianshihou.user1.site
 
+由于服务器的配置较低无法有效部署ES、HotKey、Nacos、Sentinel等等，从而导致部署上线的功能缺失了（全局检索的ES提供的功能以及一些限流等操作）
+
 ## 架构设计
 
 ### 1、核心业务流程图

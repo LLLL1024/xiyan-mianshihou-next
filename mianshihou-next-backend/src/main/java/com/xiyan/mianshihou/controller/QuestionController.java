@@ -9,7 +9,10 @@ import com.alibaba.csp.sentinel.SphU;
 import com.alibaba.csp.sentinel.Tracer;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeException;
+import com.alibaba.nacos.api.NacosFactory;
+import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.annotation.NacosValue;
+import com.alibaba.nacos.api.exception.NacosException;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jd.platform.hotkey.client.callback.JdHotKeyStore;
 import com.xiyan.mianshihou.annotation.AuthCheck;
@@ -33,10 +36,13 @@ import com.xiyan.mianshihou.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
+import org.yaml.snakeyaml.Yaml;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -159,11 +165,11 @@ public class QuestionController {
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
 //        // 检测和处置爬虫
 //        User loginUser = userService.getLoginUser(request);
-//        crawlerDetect(loginUser.getId());
+//        crawlerDetect(loginUser.getId(), request);
         // 检测和处置爬虫（可以自行扩展为 - 登录后才能获取到答案）
         User loginUser = userService.getLoginUserPermitNull(request);
         if (loginUser != null) {
-            crawlerDetect(loginUser.getId());
+            crawlerDetect(loginUser.getId(), request);
         }
         // 友情提示，对于敏感的内容，可以再打印一些日志，记录用户访问的内容
 
@@ -203,7 +209,7 @@ public class QuestionController {
      *
      * @param loginUserId
      */
-    private void crawlerDetect(long loginUserId) {
+    private void crawlerDetect(long loginUserId, HttpServletRequest request) {
         // 调用多少次时告警
         final int WARN_COUNT = 10;
         // 调用多少次时封号
@@ -221,6 +227,28 @@ public class QuestionController {
             updateUser.setId(loginUserId);
             updateUser.setUserRole("ban");
             userService.updateById(updateUser);
+            // 自动添加有危险的 IP 到黑名单里（Nacos配置里）
+//            String dataId = "mianshihou";
+//            String group = "DEFAULT_GROUP";
+//            String serverAddr = "127.0.0.1:8848";
+//            Properties properties = new Properties();
+//            properties.put("serverAddr", serverAddr);
+//            try {
+//                ConfigService configService = NacosFactory.createConfigService(properties);
+//                String content = configService.getConfig(dataId, group, 5000);
+//                // 解析 yaml 文件
+//                Yaml yaml = new Yaml();
+//                Map map = yaml.loadAs(content, Map.class);
+//                // 获取 IP 黑名单
+//                List<String> blackIpList = (List<String>) map.get("blackIpList");
+//                // 获取 IP，添加 IP
+//                String remoteAddr = request.getRemoteAddr();
+//                blackIpList.add(remoteAddr);
+//                // 重新写入配置文件
+//                configService.publishConfig(dataId, group, yaml.dumpAsMap(map));
+//            } catch (NacosException e) {
+//                e.printStackTrace();
+//            }
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "访问次数过多，已被封号");
         }
         // 是否告警（为什么用等于？因为如果用大于10次后就会在第10次之后一直发警告，所以只需在第10次发警告即可，等过期时间结束后在重新计数）

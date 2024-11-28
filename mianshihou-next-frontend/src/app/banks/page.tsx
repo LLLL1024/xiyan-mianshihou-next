@@ -1,9 +1,12 @@
-"use server";
+// "use server";
 import Title from "antd/es/typography/Title";
 import { message } from "antd";
 import { listQuestionBankVoByPageUsingPost } from "@/api/questionBankController";
 import QuestionBankList from "@/components/QuestionBankList";
 import "./index.css";
+
+// 本页面使用服务端渲染，禁用静态生成
+export const dynamic = 'force-dynamic';
 
 /**
  * 题库列表页面

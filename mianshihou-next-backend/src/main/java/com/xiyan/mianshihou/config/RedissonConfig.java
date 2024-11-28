@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * Redisson 配置
  */
 @Configuration
-@ConfigurationProperties(prefix = "spring.redisson")
+@ConfigurationProperties(prefix = "spring.redis")
 @Data
 public class RedissonConfig {
 
