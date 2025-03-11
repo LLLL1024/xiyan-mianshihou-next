@@ -228,12 +228,17 @@ declare namespace API {
 
   type LoginUserVO = {
     createTime?: string;
+    email?: string;
+    expertiseDirection?: string;
+    grade?: string;
     id?: number;
+    phoneNumber?: string;
     updateTime?: string;
     userAvatar?: string;
     userName?: string;
     userProfile?: string;
     userRole?: string;
+    workExperience?: string;
   };
 
   type OrderItem = {
@@ -644,9 +649,13 @@ declare namespace API {
   type User = {
     createTime?: string;
     editTime?: string;
+    email?: string;
+    expertiseDirection?: string;
+    grade?: string;
     id?: number;
     isDelete?: number;
     mpOpenId?: string;
+    phoneNumber?: string;
     unionId?: string;
     updateTime?: string;
     userAccount?: string;
@@ -655,6 +664,7 @@ declare namespace API {
     userPassword?: string;
     userProfile?: string;
     userRole?: string;
+    workExperience?: string;
   };
 
   type UserAddRequest = {
@@ -662,6 +672,17 @@ declare namespace API {
     userAvatar?: string;
     userName?: string;
     userRole?: string;
+  };
+
+  type UserEditRequest = {
+    email?: string;
+    expertiseDirection?: string;
+    grade?: string;
+    phoneNumber?: string;
+    userAvatar?: string;
+    userName?: string;
+    userProfile?: string;
+    workExperience?: string;
   };
 
   type userLoginByWxOpenUsingGETParams = {
