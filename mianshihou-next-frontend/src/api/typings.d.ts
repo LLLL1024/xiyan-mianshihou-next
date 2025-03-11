@@ -29,6 +29,18 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseMockInterview_ = {
+    code?: number;
+    data?: MockInterview;
+    message?: string;
+  };
+
+  type BaseResponsePageMockInterview_ = {
+    code?: number;
+    data?: PageMockInterview_;
+    message?: string;
+  };
+
   type BaseResponsePagePost_ = {
     code?: number;
     data?: PagePost_;
@@ -181,6 +193,11 @@ declare namespace API {
     username?: string;
   };
 
+  type getMockInterviewByIdUsingGETParams = {
+    /** id */
+    id?: number;
+  };
+
   type getPostVOByIdUsingGETParams = {
     /** id */
     id?: number;
@@ -241,9 +258,60 @@ declare namespace API {
     workExperience?: string;
   };
 
+  type MockInterview = {
+    createTime?: string;
+    difficulty?: string;
+    id?: number;
+    isDelete?: number;
+    jobPosition?: string;
+    messages?: string;
+    status?: number;
+    updateTime?: string;
+    userId?: number;
+    workExperience?: string;
+  };
+
+  type MockInterviewAddRequest = {
+    difficulty?: string;
+    jobPosition?: string;
+    workExperience?: string;
+  };
+
+  type MockInterviewEventRequest = {
+    event?: string;
+    id?: number;
+    message?: string;
+  };
+
+  type MockInterviewQueryRequest = {
+    current?: number;
+    difficulty?: string;
+    id?: number;
+    jobPosition?: string;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    status?: number;
+    userId?: number;
+    workExperience?: string;
+  };
+
   type OrderItem = {
     asc?: boolean;
     column?: string;
+  };
+
+  type PageMockInterview_ = {
+    countId?: string;
+    current?: number;
+    maxLimit?: number;
+    optimizeCountSql?: boolean;
+    orders?: OrderItem[];
+    pages?: number;
+    records?: MockInterview[];
+    searchCount?: boolean;
+    size?: number;
+    total?: number;
   };
 
   type PagePost_ = {

@@ -17,9 +17,8 @@ export const menus = [
     name: "题目",
   },
   {
-    name: "面试猴",
-    path: "https://mianshiya.com",
-    target: "_blank",
+    path: "/mockInterview/add",
+    name: "AI 模拟面试",
   },
   {
     path: "/user/center",
