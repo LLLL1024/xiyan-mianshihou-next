@@ -477,6 +477,11 @@ declare namespace API {
     title?: string;
   };
 
+  type QuestionAIGenerateRequest = {
+    number?: number;
+    questionType?: string;
+  };
+
   type QuestionBank = {
     createTime?: string;
     description?: string;

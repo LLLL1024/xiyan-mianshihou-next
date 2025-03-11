@@ -218,3 +218,7 @@ knife4j:
         api-rule: package
         api-rule-resources:
           - com.xiyan.mianshihou.controller
+
+# AI 大模型接入（目前是火山引擎 DeepSeek）
+ai:
+  apiKey: 填写自己的 API Key

@@ -1,6 +1,7 @@
 ### @author <a href="https://github.com/LLLL1024">程序员兮颜</a> ###
 ## ###
 .DS_Store
+application-local.yml
 
 HELP.md
 target/
